@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FLEXI Parking | Smart Parking & User Management</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <nav class="nav">
+    <a class="brand" href="#"><span class="brand-mark">F</span> FLEXI<span class="brand-light">PARK</span></a>
+    <div class="nav-right">
+      <span class="live-dot"></span>
+      <span id="dbStatus">Checking database…</span>
+      <div id="authNavContainer">
+        <button id="openAuthBtn" class="nav-auth-btn">Login / Sign Up</button>
+      </div>
+    </div>
+  </nav>
+  <main class="shell">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">SMART PARKING & USER MANAGEMENT</p>
+        <h1>Your spot.<br/><span>Without the hassle.</span></h1>
+        <p class="subhead">Find an open space, book it in seconds, and synchronize all bookings and registered users directly to MongoDB Compass.</p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <a href="#parking" class="primary-link">Explore parking <span>↘</span></a>
+          <button id="heroRegisterBtn" class="primary-link" style="background: #3d5749; cursor: pointer; border: none;">Create Account <span>+</span></button>
+        </div>
+      </div>
+      <div class="hero-art" aria-label="Parking illustration">
+        <div class="sun"></div><div class="road"><div class="road-line"></div></div>
+        <div class="car car-back"><div class="window"></div><div class="wheel left"></div><div class="wheel right"></div></div>
+        <div class="car car-front"><div class="window"></div><div class="wheel left"></div><div class="wheel right"></div></div>
+        <div class="parking-sign"><b>P</b><small>PARKING</small></div>
+      </div>
+    </section>
+    <section class="stats" aria-label="Parking summary">
+      <article class="stat-card"><span class="stat-icon green">↗</span><div><p>Available spaces</p><h2 id="availableCount">—</h2></div></article>
+      <article class="stat-card"><span class="stat-icon dark">▣</span><div><p>Occupied spaces</p><h2 id="occupiedCount">—</h2></div></article>
+      <article class="stat-card"><span class="stat-icon orange">⌁</span><div><p>Total capacity</p><h2 id="totalCount">—</h2></div></article>
+      <article class="stat-card"><span class="stat-icon purple">◷</span><div><p>Utilization</p><h2 id="utilization">—</h2></div></article>
+    </section>
+    <section id="parking" class="parking-section">
+      <div class="section-heading"><div><p class="eyebrow">LIVE OVERVIEW</p><h2>Parking spaces</h2><p class="muted" id="userWelcomeText">Select an available slot to make a booking.</p></div>
+        <div class="filters"><button class="filter active" data-filter="All">All spaces</button><button class="filter" data-filter="Available">Available</button><button class="filter" data-filter="Occupied">Occupied</button></div>
+      </div>
+      <div class="legend"><span><i class="legend-dot free"></i> Available</span><span><i class="legend-dot busy"></i> Occupied</span><span class="refresh-label">● Live data synced with MongoDB Compass</span></div>
+      <div id="slotGrid" class="slot-grid"><div class="loading">Loading parking spaces…</div></div>
+    </section>
+
+    <!-- MongoDB Compass Details Section -->
+    <section class="compass-card-section">
+      <div class="compass-card-header">
+        <span style="font-size: 24px;">🍃</span>
+        <div>
+          <h3>MongoDB Compass Connection Guide</h3>
+          <p class="muted" style="margin: 3px 0 0;">Inspect your live database records, users, and parking slots in MongoDB Compass GUI.</p>
+        </div>
+      </div>
+      <div class="compass-grid-info">
+        <div class="compass-info-item">
+          <span>Compass Connection String</span>
+          <code>mongodb://127.0.0.1:27017</code>
+        </div>
+        <div class="compass-info-item">
+          <span>Database Name</span>
+          <code>flexi_parking</code>
+        </div>
+        <div class="compass-info-item">
+          <span>Collections</span>
+          <code>users · slots</code>
+        </div>
+      </div>
+    </section>
+
+    <section class="bottom-note"><div class="note-icon">✦</div><div><b>Full-Stack Parking & Authentication.</b><p>Every account registration, sign-in, and slot reservation writes directly to MongoDB.</p></div><span class="note-tag">FLEXI CA3</span></section>
+    <footer>© 2026 FLEXIPARK <span>Full-Stack MERN / Express + MongoDB Compass</span></footer>
+  </main>
+
+  <!-- Booking Dialog -->
+  <dialog id="bookingDialog">
+    <form id="bookingForm" method="dialog">
+      <button type="button" class="close" id="closeDialog" aria-label="Close">×</button>
+      <p class="eyebrow">RESERVE YOUR SPACE</p><h2 id="dialogTitle">Book parking slot</h2>
+      <p class="muted">Enter the details for your vehicle.</p>
+      <input type="hidden" id="slotId" />
+      <div id="bookingUserHint" style="display:none; background: #edf8e5; padding: 8px 12px; border-radius: 8px; font-size: 11px; color: #356621; margin: 10px 0;">✓ Autofilled from your logged-in profile</div>
+      <label for="ownerName">Your name</label><input id="ownerName" required maxlength="70" placeholder="e.g. Alex Sharma" />
+      <label for="vehicleNumber">Vehicle registration</label><input id="vehicleNumber" required maxlength="20" placeholder="e.g. MH 31 AB 1234" />
+      <button class="submit-btn" type="submit">Confirm booking <span>→</span></button>
+      <p id="formMessage" class="form-message"></p>
+    </form>
+  </dialog>
+
+  <!-- Auth Dialog (Login & Register) -->
+  <dialog id="authDialog">
+    <form id="authForm" method="dialog">
+      <button type="button" class="close" id="closeAuthDialog" aria-label="Close">×</button>
+      <p class="eyebrow">AUTHENTICATION</p>
+      <h2 id="authDialogTitle">Welcome Back</h2>
+      <p class="muted" id="authDialogSubtitle">Sign in to access your parking reservations.</p>
+
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab active" id="tabLogin">Sign In</button>
+        <button type="button" class="auth-tab" id="tabRegister">Register</button>
+      </div>
+
+      <div id="loginQuickRow" class="quick-fill-row">
+        <span>Quick demo fill:</span>
+        <button type="button" class="quick-fill-chip" id="demoAdminBtn">Admin Account</button>
+        <button type="button" class="quick-fill-chip" id="demoUserBtn">User Account</button>
+      </div>
+
+      <div id="registerNameGroup" style="display: none;">
+        <label for="authName">Full Name</label>
+        <input id="authName" placeholder="e.g. John Doe" />
+      </div>
+
+      <label for="authEmail">Email Address</label>
+      <input type="email" id="authEmail" required placeholder="admin@flexipark.com" />
+
+      <label for="authPassword">Password</label>
+      <input type="password" id="authPassword" required placeholder="Enter password (min 6 chars)" />
+
+      <div id="registerExtraGroup" style="display: none;">
+        <label for="authVehicle">Vehicle Number (Optional)</label>
+        <input id="authVehicle" placeholder="e.g. MH 12 AB 9999" />
+        <label for="authPhone">Phone Number (Optional)</label>
+        <input type="tel" id="authPhone" placeholder="e.g. +91 98765 00000" />
+      </div>
+
+      <p id="authMessage" class="form-message" style="margin-top: 10px;"></p>
+
+      <button class="submit-btn" type="submit" id="authSubmitBtn">Sign In <span>→</span></button>
+
+      <div class="compass-info-box">
+        <span class="compass-badge-icon">🍃</span>
+        <div>
+          <b>MongoDB Compass Sync:</b>
+          <div>Accounts are stored in database <code>flexi_parking</code>, collection <code>users</code>.</div>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script src="/app.js"></script>
+</body>
+</html>

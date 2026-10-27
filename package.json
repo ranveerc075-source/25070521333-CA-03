@@ -1,0 +1,14 @@
+{
+  "name": "flexi-parking-project",
+  "version": "1.0.0",
+  "description": "FLEXI Parking System with divided client (React) and server (Node.js) folders",
+  "scripts": {
+    "start": "node server/server.js",
+    "server": "npm start --prefix server",
+    "server:dev": "npm run dev --prefix server",
+    "client": "npm run dev --prefix client",
+    "client:build": "npm run build --prefix client",
+    "build": "npm run build --prefix client",
+    "setup": "npm install --prefix server && npm install --prefix client && npm run build --prefix client"
+  }
+}
